@@ -1,0 +1,57 @@
+\
+---
+title: "cdeMissing: Quickstart"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{cdeMissing: Quickstart}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+## Overview
+
+`cdeMissing` implements a CDE-style approach for longitudinal mixed models with missing covariates.
+
+## Basic usage (Gaussian / LMM)
+
+```{r, eval=FALSE}
+library(cdeMissing)
+
+fit <- cde_fit(
+  y ~ x1 + Treatment + Time + x2,
+  data = dat_long,
+  id = "id",
+  time = "Time",
+  missing = list(
+    baseline = c("x1"),
+    time_dependent = c("x2")
+  ),
+  family = gaussian()
+)
+
+summary(fit)
+cde_fixef(fit)
+```
+
+## Binary outcome (GLMM)
+
+```{r, eval=FALSE}
+fit_bin <- cde_fit(
+  y ~ x1 + Treatment + Time + x2,
+  data = dat_long,
+  id = "id",
+  time = "Time",
+  missing = list(
+    baseline = c("x1"),
+    time_dependent = c("x2")
+  ),
+  family = binomial(),
+  engine = "lme4",
+  control = list(nAGQ = 0)
+)
+summary(fit_bin)
+```
