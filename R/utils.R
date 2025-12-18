@@ -1,4 +1,3 @@
-\
 #' Internal helper: null-coalescing operator
 #' @keywords internal
 `%||%` <- function(x, y) if (is.null(x) || length(x) == 0) y else x
