@@ -1,4 +1,3 @@
-\
 #' Augment long-format data with CDE-style missingness features
 #'
 #' This function generalizes the core augmentation used in your simulation scripts:
