@@ -1,4 +1,3 @@
-\
 #' Build an augmented fixed-effect RHS by appending u_* and baseline missingness terms
 #' @keywords internal
 .cde_fixed_rhs <- function(formula, data_aug) {
