@@ -1,4 +1,3 @@
-\
 test_that("cde_augment_data creates expected columns", {
   skip_if_not_installed("nlme")
   dat <- data.frame(
