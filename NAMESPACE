@@ -1,0 +1,12 @@
+# Generated manually for the skeleton; you may overwrite via roxygen2.
+export(cde_fit)
+export(cde_augment_data)
+export(cde_fixef)
+export(cde_augmented_data)
+S3method(print,cde_fit)
+S3method(summary,cde_fit)
+S3method(coef,cde_fit)
+importFrom(nlme,lme,varIdent,lmeControl,fixef)
+importFrom(lme4,glmer,fixef)
+importFrom(stats,as.formula,terms,coef,model.frame,na.omit,family)
+importFrom(utils,head)

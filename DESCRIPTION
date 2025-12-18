@@ -1,0 +1,26 @@
+Package: cdeMissing
+Type: Package
+Title: Conditional Distribution Estimation with Missing Covariates in Longitudinal Mixed Models
+Version: 0.0.1
+Authors@R: c(
+    person(given = "Jiangshan", family = "Zhang", role = c("aut", "cre"),
+           email = "you@example.com")
+  )
+Description: Implements a CDE-style approach for longitudinal mixed models with missing covariates.
+    The package augments long-format data with missingness indicators and timepoint dummies, then fits
+    LMMs (via 'nlme') or GLMMs (via 'lme4') using a consistent, configurable interface.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports:
+    stats,
+    utils,
+    nlme,
+    lme4
+Suggests:
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown
+Config/testthat/edition: 3
