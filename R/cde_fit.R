@@ -1,4 +1,3 @@
-\
 #' Fit CDE-style LMM/GLMM with missing covariates
 #'
 #' This is the main user-facing function for **cdeMissing**.
