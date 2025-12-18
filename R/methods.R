@@ -1,4 +1,3 @@
-\
 #' @export
 print.cde_fit <- function(x, ...) {
   cat("<cde_fit>\n")
