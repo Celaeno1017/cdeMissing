@@ -65,7 +65,7 @@ cde_fit <- function(
     form_fix <- stats::as.formula(paste(y_name, "~", rhs))
 
     # Default mirrors your LMM CDE: random slopes for missingness + varIdent by missingness pattern
-    fit <- nlme::lme(
+    fit <-  try(nlme::lme(
       fixed = form_fix,
       data  = dat_aug,
       random = stats::as.formula(paste("~ 1 + mis_any |", id)),
