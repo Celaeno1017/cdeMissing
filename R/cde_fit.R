@@ -68,8 +68,8 @@ cde_fit <- function(
     fit <- nlme::lme(
       fixed = form_fix,
       data  = dat_aug,
-      random = stats::as.formula(paste("~ 1 + mis_base_any + mis_td_any |", id)),
-      weights = nlme::varIdent(form = ~ 1 | interaction(mis_base_any, mis_td_any, drop = TRUE)),
+      random = stats::as.formula(paste("~ 1 + mis_any |", id)),
+      weights = nlme::varIdent(form = ~ 1 | mis_td_any),
       control = do.call(nlme::lmeControl, control)
     )
 
