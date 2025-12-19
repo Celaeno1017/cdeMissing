@@ -70,7 +70,7 @@ cde_fit <- function(
       data  = dat_aug,
       random = stats::as.formula(paste("~ 1 + mis_any |", id)),
       weights = nlme::varIdent(form = ~ 1 | mis_td_any),
-      control = do.call(nlme::lmeControl, control)
+      control = lmeControl(opt = "nlminb")),silent = TRUE)
     )
 
     out <- list(
