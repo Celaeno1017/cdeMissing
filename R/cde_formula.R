@@ -5,7 +5,7 @@
 
   # u_* dummies and baseline missingness flags
   u_terms <- grep("^u_", names(data_aug), value = TRUE)
-  base_mis_terms <- grep("^mis_base_", names(data_aug), value = TRUE)
+  base_mis_terms <- grep("^mis_base_any", names(data_aug), value = TRUE)
 
   rhs <- paste(c(base_terms, u_terms, base_mis_terms), collapse = " + ")
   rhs
