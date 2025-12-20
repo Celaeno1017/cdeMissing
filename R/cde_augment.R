@@ -32,10 +32,10 @@ cde_augment_data <- function(
   time_dependent_missing <- .as_chrv(time_dependent_missing, "time_dependent_missing")
 
   if (!is.data.frame(data)) stop("`data` must be a data.frame.", call. = FALSE)
-  if (!all(c(id, time) %in% names(data))) {
-    stop("`id` and/or `time` not found in `data` column names.", call. = FALSE)
+  if (!all(c(id) %in% names(data))) {
+    stop("`id` not found in `data` column names.", call. = FALSE)
   }
-
+  if (! time %in% names(data) && nchar(time_dependent_missing)!=0){stop(" `time` not found in `data` column names while `time_dependent_missing` variable exists. Please include `time` variables in dataset.", call. = FALSE)
   dat <- data
   dat[[id]] <- as.factor(dat[[id]])
 
