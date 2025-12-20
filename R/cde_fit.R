@@ -63,7 +63,7 @@ cde_fit <- function(
 
   if (engine == "nlme") {
     form_fix <- stats::as.formula(paste(y_name, "~", rhs))
-
+     if (nchar(td_missing)!=0){
     # Default mirrors your LMM CDE: random slopes for missingness + varIdent by missingness pattern
     fit <-  try(nlme::lme(
       fixed = form_fix,
@@ -71,7 +71,13 @@ cde_fit <- function(
       random = stats::as.formula(paste("~ 1 + mis_any |", id)),
       weights = nlme::varIdent(form = ~ 1 | mis_td_any),
       control = nlme::lmeControl(opt = "nlminb")),silent = TRUE)
-    
+    }
+    else{ fit <-  try(nlme::lme(
+      fixed = form_fix,
+      data  = dat_aug,
+      random = stats::as.formula(paste("~ 1 + mis_any |", id)),
+      control = nlme::lmeControl(opt = "nlminb")),silent = TRUE)
+    }
 
     out <- list(
       fit = fit,
@@ -87,11 +93,14 @@ cde_fit <- function(
   if (engine == "lme4") {
     # Default mirrors your GLMM CDE: (mis_id-1|id) + (mis_t_id-1|ct)
     # Here we generalize to mis_any and mis_td_any.
+    if (nchar(td_missing)!=0){
     glmm_rhs <- paste0(
       rhs,
       " + (mis_any - 1 | ", id, ")",
       " + (mis_td_any - 1 | ct)"
     )
+      }
+    else{glmm_rhs <- paste0(rhs," + (mis_any - 1 | ", id, "))}
     form_glmm <- stats::as.formula(paste(y_name, "~", glmm_rhs))
 
     nAGQ <- control$nAGQ %||% 0
