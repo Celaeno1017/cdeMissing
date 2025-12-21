@@ -34,6 +34,7 @@ cde_fit <- function(
   data,
   id,
   time,
+  correlation =NULL,
   missing = list(baseline = character(0), time_dependent = character(0)),
   family = stats::gaussian(),
   engine = c("auto", "nlme", "lme4"),
@@ -72,11 +73,13 @@ cde_fit <- function(
       data  = dat_aug,
       random = merge_random_list_by_group(form_random, stats::as.formula(paste("~ mis_any-1 | id"))),
       weights = nlme::varIdent(form = ~ 1 | mis_td_any),
+      correlation = correlation,
       control = nlme::lmeControl(opt = "nlminb")),silent = FALSE)
     }
     else{ fit <-  try(nlme::lme(
       fixed = form_fix,
       data  = dat_aug,
+      correlation = correlation,
       random = merge_random_list_by_group(form_random, stats::as.formula(paste("~  mis_any-1 |id"))),
       control = nlme::lmeControl(opt = "nlminb")),silent = FALSE)
     }
@@ -95,6 +98,7 @@ cde_fit <- function(
   if (engine == "lme4") {
     # Default mirrors your GLMM CDE: (mis_id-1|id) + (mis_t_id-1|ct)
     # Here we generalize to mis_any and mis_td_any.
+    if (!is.nulll(correlation)){stop("lme4 does not support covariance structure.")}
     form_fix <- stats::as.formula(paste(y_name, "~", rhs))
     form_random <- random
     random = merge_random_list_by_group(form_random, stats::as.formula(paste("~  mis_any-1 |id")))
