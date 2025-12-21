@@ -32,10 +32,19 @@ cde_augment_data <- function(
   time_dependent_missing <- .as_chrv(time_dependent_missing, "time_dependent_missing")
 
   if (!is.data.frame(data)) stop("`data` must be a data.frame.", call. = FALSE)
-  if (!all(c(id) %in% names(data))) {
+
+  if (!(id %in% names(data))) {
     stop("`id` not found in `data` column names.", call. = FALSE)
   }
-  if (! time %in% names(data) && nchar(time_dependent_missing)!=0){stop(" `time` not found in `data` column names while `time_dependent_missing` variable exists. Please include `time` variables in dataset.", call. = FALSE)
+
+  # Only require `time` if user declares time-dependent covariates
+  if (!(time %in% names(data)) && length(time_dependent_missing) > 0) {
+    stop(
+      "`time` not found in `data` while `time_dependent_missing` is non-empty. Please include `time` in the dataset.",
+      call. = FALSE
+    )
+  }
+
   dat <- data
   dat[[id]] <- as.factor(dat[[id]])
 
@@ -53,7 +62,7 @@ cde_augment_data <- function(
   # baseline flags
   dat$mis_base_any <- 0L
   for (v in baseline_missing) {
-    if (!v %in% names(dat)) next
+    if (!(v %in% names(dat))) next
     nm <- paste0("mis_base_", v)
     dat[[nm]] <- as.integer(is.na(dat[[v]]))
     dat$mis_base_any <- pmax(dat$mis_base_any, dat[[nm]])
@@ -62,7 +71,7 @@ cde_augment_data <- function(
   # time-dependent flags + timepoint dummies
   dat$mis_td_any <- 0L
   for (v in time_dependent_missing) {
-    if (!v %in% names(dat)) next
+    if (!(v %in% names(dat))) next
     nm <- paste0("mis_td_", v)
     mis_v <- is.na(dat[[v]])
     dat[[nm]] <- as.integer(mis_v)
@@ -70,17 +79,14 @@ cde_augment_data <- function(
 
     # Determine which timepoints have missingness for this variable
     t_miss <- sort(unique(dat[[time]][mis_v]))
-    if (length(t_miss) > 0) {
-      for (tt in t_miss) {
-        u_nm <- paste0("u_", v, "_t", tt)
-        dat[[u_nm]] <- as.integer(mis_v & (dat[[time]] == tt))
-      }
+    for (tt in t_miss) {
+      u_nm <- paste0("u_", v, "_t", tt)
+      dat[[u_nm]] <- as.integer(mis_v & (dat[[time]] == tt))
     }
   }
 
   # Replace NA with 0 (or replace_na_with) ONLY for covariates listed in covs
   for (v in covs) {
-    if (!v %in% names(dat)) next
     idx <- is.na(dat[[v]])
     if (any(idx)) dat[[v]][idx] <- replace_na_with
   }
