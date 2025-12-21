@@ -33,7 +33,7 @@ cde_fit <- function(
   random=list(),
   data,
   id,
-  time,
+  time='Time',
   correlation =NULL,
   missing = list(baseline = character(0), time_dependent = character(0)),
   family = stats::gaussian(),
