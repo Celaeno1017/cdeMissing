@@ -151,7 +151,7 @@ lme_random_to_lme4_terms <- function(random) {
 #' Internal helper: convert lme format for random effect to lmer format
 #' @keywords internal
 # Public: build lmer() formula and a runnable call string
-lme_to_lmer <- function(fixed, random, data_name = "data", REML = TRUE) {
+lme_to_lmer <- function(fixed, random) {
   if (!inherits(fixed, "formula")) stop("`fixed` must be a formula.", call. = FALSE)
 
   re_terms <- lme_random_to_lme4_terms(random)
@@ -160,15 +160,9 @@ lme_to_lmer <- function(fixed, random, data_name = "data", REML = TRUE) {
 
   out_formula <- as.formula(paste0(fixed_str, " + ", rhs_add))
 
-  out_call <- paste0(
-    "lme4::lmer(",
-    deparse(out_formula),
-    ", data = ", data_name,
-    ", REML = ", if (isTRUE(REML)) "TRUE" else "FALSE",
-    ", control = lme4::lmerControl(optimizer = \"bobyqa\"))"
-  )
+  
 
-  list(formula = out_formula, re_terms = re_terms, call = out_call)
+  list(formula = out_formula, re_terms = re_terms)
 }
 
 
