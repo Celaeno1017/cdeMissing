@@ -22,7 +22,7 @@ devtools::install_github("Celaeno1017/cdeMissing")
 First, load the R package.
 
 ```r
-library(ememax)
+library(cdeMissing)
 ```
 
 To illustrate the main features of the R package `cdeMissing`, let's first generate some data. We have built in a few functions directly into the R package for this purpose.
