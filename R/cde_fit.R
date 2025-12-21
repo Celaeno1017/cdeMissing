@@ -66,7 +66,7 @@ cde_fit <- function(
   if (engine == "nlme") {
     form_fix <- stats::as.formula(paste(y_name, "~", rhs))
     form_random <- random
-     if (nchar(td_missing)!=0){
+     if (length(td_missing)!=0){
     # Default mirrors your LMM CDE: random slopes for missingness + varIdent by missingness pattern
     fit <-  try(nlme::lme(
       fixed = form_fix,
@@ -103,7 +103,7 @@ cde_fit <- function(
     form_random <- random
     random = merge_random_list_by_group(form_random, stats::as.formula(paste("~  mis_any-1 |id")))
     glmm_rhs <-lme_to_lmer(form_fix,random)$formula
-    if (nchar(td_missing)!=0){
+    if (length(td_missing)!=0){
     
    # glmm_rhs <- paste0(
    #   rhs,
