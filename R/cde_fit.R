@@ -102,7 +102,11 @@ cde_fit <- function(
     form_fix <- stats::as.formula(paste(y_name, "~", rhs))
     form_random <- random
     random = merge_random_list_by_group(form_random, stats::as.formula(paste("~  mis_any-1 |id")))
+    print(random)
+    print(form_fix)
     glmm_rhs <-lme_to_lmer(form_fix,random)$formula
+    prinnt(glmm_rhs)
+    
     if (length(td_missing)!=0){
     
    # glmm_rhs <- paste0(
