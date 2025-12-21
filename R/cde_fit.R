@@ -98,7 +98,7 @@ cde_fit <- function(
     form_fix <- stats::as.formula(paste(y_name, "~", rhs))
     form_random <- random
     random = merge_random_list_by_group(form_random, stats::as.formula(paste("~  mis_any-1 |", id)))
-    glmm_rhs <-lme_to_lmer(form_fix,random)$formula)
+    glmm_rhs <-lme_to_lmer(form_fix,random)$formula
     if (nchar(td_missing)!=0){
     
    # glmm_rhs <- paste0(
@@ -106,7 +106,7 @@ cde_fit <- function(
    #   " + (mis_any - 1 | ", id, ")",
    #   " + (mis_td_any - 1 | ct)"
    # )
-      }
+   #   }
 
     glmm_rhs <- paste0(
       glmm_rhs,
