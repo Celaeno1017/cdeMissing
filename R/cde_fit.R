@@ -30,6 +30,7 @@
 #' @export
 cde_fit <- function(
   formula,
+  random=list(),
   data,
   id,
   time,
@@ -63,19 +64,20 @@ cde_fit <- function(
 
   if (engine == "nlme") {
     form_fix <- stats::as.formula(paste(y_name, "~", rhs))
+    form_random <- random
      if (nchar(td_missing)!=0){
     # Default mirrors your LMM CDE: random slopes for missingness + varIdent by missingness pattern
     fit <-  try(nlme::lme(
       fixed = form_fix,
       data  = dat_aug,
-      random = stats::as.formula(paste("~ 1 + mis_any |", id)),
+      random = .combine_two_same_group(form_random, stats::as.formula(paste("~ 1 + mis_any |", id))),
       weights = nlme::varIdent(form = ~ 1 | mis_td_any),
       control = nlme::lmeControl(opt = "nlminb")),silent = TRUE)
     }
     else{ fit <-  try(nlme::lme(
       fixed = form_fix,
       data  = dat_aug,
-      random = stats::as.formula(paste("~ 1 + mis_any |", id)),
+      random = .combine_two_same_group(form_random, stats::as.formula(paste("~ 1 + mis_any |", id))),
       control = nlme::lmeControl(opt = "nlminb")),silent = TRUE)
     }
 
