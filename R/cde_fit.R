@@ -70,14 +70,14 @@ cde_fit <- function(
     fit <-  try(nlme::lme(
       fixed = form_fix,
       data  = dat_aug,
-      random = merge_random_list_by_group(form_random, stats::as.formula(paste("~ 1 + mis_any |", id))),
+      random = merge_random_list_by_group(form_random, stats::as.formula(paste("~ mis_any-1 |", id))),
       weights = nlme::varIdent(form = ~ 1 | mis_td_any),
       control = nlme::lmeControl(opt = "nlminb")),silent = TRUE)
     }
     else{ fit <-  try(nlme::lme(
       fixed = form_fix,
       data  = dat_aug,
-      random = merge_random_list_by_group(form_random, stats::as.formula(paste("~ 1 + mis_any |", id))),
+      random = merge_random_list_by_group(form_random, stats::as.formula(paste("~  mis_any-1 |", id))),
       control = nlme::lmeControl(opt = "nlminb")),silent = TRUE)
     }
 
@@ -95,16 +95,28 @@ cde_fit <- function(
   if (engine == "lme4") {
     # Default mirrors your GLMM CDE: (mis_id-1|id) + (mis_t_id-1|ct)
     # Here we generalize to mis_any and mis_td_any.
+    form_fix <- stats::as.formula(paste(y_name, "~", rhs))
+    form_random <- random
+    random = merge_random_list_by_group(form_random, stats::as.formula(paste("~  mis_any-1 |", id)))
+    glmm_rhs <-lme_to_lmer(form_fix,random)$formula)
     if (nchar(td_missing)!=0){
+    
+   # glmm_rhs <- paste0(
+   #   rhs,
+   #   " + (mis_any - 1 | ", id, ")",
+   #   " + (mis_td_any - 1 | ct)"
+   # )
+      }
+
     glmm_rhs <- paste0(
-      rhs,
-      " + (mis_any - 1 | ", id, ")",
+      glmm_rhs,
       " + (mis_td_any - 1 | ct)"
     )
       }
-    else{glmm_rhs <- paste0(rhs," + (mis_any - 1 | ", id, "))}
-    form_glmm <- stats::as.formula(paste(y_name, "~", glmm_rhs))
-
+    else{#glmm_rhs <- paste0(rhs," + (mis_any - 1 | ", id, "))
+    glmm_rhs<-glmm_rhs}
+    #form_glmm <- stats::as.formula(paste(y_name, "~", glmm_rhs))
+    form_glmm <-stats::as.formula(glmm_rhs)
     nAGQ <- control$nAGQ %||% 0
     fit <- lme4::glmer(
       form_glmm,
