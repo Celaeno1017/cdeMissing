@@ -117,7 +117,7 @@ cde_fit <- function(
    #   }
 
     glmm_rhs <- paste0(
-      glmm_rhs,
+      deparse1(glmm_rhs),
       " + (mis_td_any - 1 | ct)"
     )
       }
