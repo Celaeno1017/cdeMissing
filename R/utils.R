@@ -176,77 +176,65 @@ lme_to_lmer <- function(fixed, random) {
   s <- gsub("\\s+", " ", paste(deparse(f), collapse = " "))
   s <- sub("^\\s*~\\s*", "", s)
   parts <- strsplit(s, "\\|", fixed = FALSE)[[1]]
-  if (length(parts) != 2) {
-    stop("Each random formula must be of the form `~ ... | group` and contain exactly one `|`.", call. = FALSE)
-  }
+  if (length(parts) != 2) stop("Need random formula of the form `~ ... | group`.", call. = FALSE)
   list(lhs = .trim(parts[1]), group = .trim(parts[2]))
 }
 
-# Canonicalize LHS and also detect whether it includes an intercept.
-# Policy we want:
-#   - has_int = TRUE if intercept is present (implicitly or explicitly)
-#   - only_int_removed = TRUE if intercept is explicitly removed (0 or -1)
-.canon_lhs_keep_intercept <- function(lhs) {
+# Extract: (a) whether intercept is present, (b) whether intercept removed, (c) non-intercept terms
+.canon_lhs <- function(lhs) {
   lhs <- gsub("\\s+", " ", .trim(lhs))
 
-  # explicit intercept removal markers
   removes_int <- grepl("(^|\\s)0(\\s|$)", lhs) || grepl("-\\s*1", lhs)
-
-  # explicit intercept inclusion marker "1"
   has_explicit_1 <- grepl("(^|\\s)1(\\s|$)", lhs)
 
-  # Heuristic: if not explicitly removed, treat intercept as present
+  # If intercept is not explicitly removed, it is present by default
   has_int <- if (removes_int) FALSE else TRUE
-  # but if it explicitly includes 1, definitely present
   if (has_explicit_1) has_int <- TRUE
 
-  # Normalize "- 1" into "+ -1"
+  # Normalize "- 1" into "+ -1" so we can split on '+'
   lhs2 <- gsub("-\\s*1", "+ -1", lhs)
-
   pieces <- unlist(strsplit(lhs2, "\\+"))
   pieces <- .trim(pieces)
   pieces <- pieces[pieces != ""]
-
-  # Remove intercept tokens
   pieces <- pieces[!pieces %in% c("1", "0", "-1", "- 1")]
-
-  # Unique terms preserving order
   if (length(pieces) > 1) pieces <- pieces[!duplicated(pieces)]
 
   list(has_int = has_int, removes_int = removes_int, terms = pieces)
 }
 
-.combine_two_same_group_keep_intercept <- function(r1, r2) {
+.combine_two_same_group <- function(r1, r2, keep_intercept = TRUE) {
   a <- .parse_rand(r1)
   b <- .parse_rand(r2)
   if (a$group != b$group) stop("Grouping factors differ; cannot combine.", call. = FALSE)
 
-  ca <- .canon_lhs_keep_intercept(a$lhs)
-  cb <- .canon_lhs_keep_intercept(b$lhs)
+  ca <- .canon_lhs(a$lhs)
+  cb <- .canon_lhs(b$lhs)
 
-  # Intercept-dominant policy:
-  # keep intercept if either side has it
-  keep_int <- ca$has_int || cb$has_int
+  if (keep_intercept) {
+    int_keep <- ca$has_int || cb$has_int
+  } else {
+    int_keep <- !(ca$removes_int || cb$removes_int)
+  }
 
   terms <- unique(c(ca$terms, cb$terms))
 
-  lhs_new <- if (keep_int) {
+  lhs_new <- if (int_keep) {
     if (length(terms) == 0) "1" else paste(c("1", terms), collapse = " + ")
   } else {
-    # only if BOTH sides removed intercept (rare under this policy)
     if (length(terms) == 0) "0" else paste(c("0", terms), collapse = " + ")
   }
 
   as.formula(paste0("~ ", lhs_new, " | ", a$group))
 }
 
-merge_random_list_by_group <- function(r_list, r_new) {
+# Main: r_list can be a formula OR a list of formulas
+merge_random_list_by_group <- function(r_list, r_new, keep_intercept = TRUE) {
+  if (inherits(r_list, "formula")) r_list <- list(r_list)
   if (is.null(r_list)) r_list <- list()
-  if (!is.list(r_list)) stop("`r_list` must be a list (possibly empty).", call. = FALSE)
+  if (!is.list(r_list)) stop("`r_list` must be a list or a formula.", call. = FALSE)
   if (!inherits(r_new, "formula")) stop("`r_new` must be a formula.", call. = FALSE)
 
   target_group <- .parse_rand(r_new)$group
-
   same_idx <- which(vapply(r_list, function(x) .parse_rand(x)$group == target_group, logical(1)))
 
   if (length(same_idx) == 0) {
@@ -256,7 +244,7 @@ merge_random_list_by_group <- function(r_list, r_new) {
 
   combined <- r_new
   for (i in same_idx) {
-    combined <- .combine_two_same_group_keep_intercept(r_list[[i]], combined)
+    combined <- .combine_two_same_group(r_list[[i]], combined, keep_intercept = keep_intercept)
   }
 
   keep <- setdiff(seq_along(r_list), same_idx)
@@ -264,7 +252,7 @@ merge_random_list_by_group <- function(r_list, r_new) {
 
   insert_pos <- min(same_idx)
   out <- append(out, list(combined), after = insert_pos - 1)
-
   out
 }
+
 
