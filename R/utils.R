@@ -177,7 +177,6 @@ lme_to_lmer <- function(fixed, random, data_name = "data", REML = TRUE) {
 
 .trim <- function(x) gsub("^\\s+|\\s+$", "", x)
 
-# Parse a random formula "~ lhs | group" into list(lhs, group)
 .parse_rand <- function(f) {
   if (!inherits(f, "formula")) stop("Random effect must be a formula.", call. = FALSE)
   s <- gsub("\\s+", " ", paste(deparse(f), collapse = " "))
@@ -189,86 +188,83 @@ lme_to_lmer <- function(fixed, random, data_name = "data", REML = TRUE) {
   list(lhs = .trim(parts[1]), group = .trim(parts[2]))
 }
 
-# Convert an lhs string (e.g. "1 + x + z", "x - 1", "0 + x") to a canonical representation
-# Returns list(no_int = TRUE/FALSE, terms = character vector of covariate terms)
-.canon_lhs <- function(lhs) {
+# Canonicalize LHS and also detect whether it includes an intercept.
+# Policy we want:
+#   - has_int = TRUE if intercept is present (implicitly or explicitly)
+#   - only_int_removed = TRUE if intercept is explicitly removed (0 or -1)
+.canon_lhs_keep_intercept <- function(lhs) {
   lhs <- gsub("\\s+", " ", .trim(lhs))
 
-  # Detect no-intercept markers
-  no_int <- grepl("(^|\\s)0(\\s|$)", lhs) || grepl("-\\s*1", lhs)
+  # explicit intercept removal markers
+  removes_int <- grepl("(^|\\s)0(\\s|$)", lhs) || grepl("-\\s*1", lhs)
 
-  # Normalize "- 1" into "+ -1" so splitting is easier
+  # explicit intercept inclusion marker "1"
+  has_explicit_1 <- grepl("(^|\\s)1(\\s|$)", lhs)
+
+  # Heuristic: if not explicitly removed, treat intercept as present
+  has_int <- if (removes_int) FALSE else TRUE
+  # but if it explicitly includes 1, definitely present
+  if (has_explicit_1) has_int <- TRUE
+
+  # Normalize "- 1" into "+ -1"
   lhs2 <- gsub("-\\s*1", "+ -1", lhs)
 
-  # Split on '+'
   pieces <- unlist(strsplit(lhs2, "\\+"))
   pieces <- .trim(pieces)
   pieces <- pieces[pieces != ""]
 
-  # Drop intercept tokens
+  # Remove intercept tokens
   pieces <- pieces[!pieces %in% c("1", "0", "-1", "- 1")]
 
   # Unique terms preserving order
-  if (length(pieces) > 1) {
-    pieces <- pieces[!duplicated(pieces)]
-  }
+  if (length(pieces) > 1) pieces <- pieces[!duplicated(pieces)]
 
-  list(no_int = no_int, terms = pieces)
+  list(has_int = has_int, removes_int = removes_int, terms = pieces)
 }
 
-# Combine two random formulas with the SAME group
-.combine_two_same_group <- function(r1, r2) {
+.combine_two_same_group_keep_intercept <- function(r1, r2) {
   a <- .parse_rand(r1)
   b <- .parse_rand(r2)
-
   if (a$group != b$group) stop("Grouping factors differ; cannot combine.", call. = FALSE)
 
-  ca <- .canon_lhs(a$lhs)
-  cb <- .canon_lhs(b$lhs)
+  ca <- .canon_lhs_keep_intercept(a$lhs)
+  cb <- .canon_lhs_keep_intercept(b$lhs)
 
-  no_int <- ca$no_int || cb$no_int
-  terms  <- unique(c(ca$terms, cb$terms))
+  # Intercept-dominant policy:
+  # keep intercept if either side has it
+  keep_int <- ca$has_int || cb$has_int
 
-  lhs_new <- if (no_int) {
-    if (length(terms) == 0) "0" else paste(c("0", terms), collapse = " + ")
-  } else {
+  terms <- unique(c(ca$terms, cb$terms))
+
+  lhs_new <- if (keep_int) {
     if (length(terms) == 0) "1" else paste(c("1", terms), collapse = " + ")
+  } else {
+    # only if BOTH sides removed intercept (rare under this policy)
+    if (length(terms) == 0) "0" else paste(c("0", terms), collapse = " + ")
   }
 
   as.formula(paste0("~ ", lhs_new, " | ", a$group))
 }
 
-# ---- main function ----
-
-#' Add/merge a random formula into an existing list of random formulas (nlme-style)
-#'
-#' @param r_list A list of formulas, each of the form `~ ... | group`.
-#' @param r_new A single formula `~ ... | group` to add.
-#' @return Updated list of random formulas. If a matching group exists, it is merged.
 merge_random_list_by_group <- function(r_list, r_new) {
   if (is.null(r_list)) r_list <- list()
   if (!is.list(r_list)) stop("`r_list` must be a list (possibly empty).", call. = FALSE)
   if (!inherits(r_new, "formula")) stop("`r_new` must be a formula.", call. = FALSE)
 
-  new_parsed <- .parse_rand(r_new)
-  target_group <- new_parsed$group
+  target_group <- .parse_rand(r_new)$group
 
-  # Find indices with same group
   same_idx <- which(vapply(r_list, function(x) .parse_rand(x)$group == target_group, logical(1)))
 
   if (length(same_idx) == 0) {
-    # No match: append
     r_list[[length(r_list) + 1]] <- r_new
     return(r_list)
   }
 
-  # Match exists: combine all matching ones with r_new into one formula
   combined <- r_new
   for (i in same_idx) {
-    combined <- .combine_two_same_group(r_list[[i]], combined)
+    combined <- .combine_two_same_group_keep_intercept(r_list[[i]], combined)
   }
 
-  # Remove all old matching entries and insert the combined one (at first match position)
   keep <- setdiff(seq_along(r_list), same_idx)
   out <- r_list[keep]
 
