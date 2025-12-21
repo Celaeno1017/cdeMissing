@@ -70,14 +70,14 @@ cde_fit <- function(
     fit <-  try(nlme::lme(
       fixed = form_fix,
       data  = dat_aug,
-      random = .combine_two_same_group(form_random, stats::as.formula(paste("~ 1 + mis_any |", id))),
+      random = merge_random_list_by_group(form_random, stats::as.formula(paste("~ 1 + mis_any |", id))),
       weights = nlme::varIdent(form = ~ 1 | mis_td_any),
       control = nlme::lmeControl(opt = "nlminb")),silent = TRUE)
     }
     else{ fit <-  try(nlme::lme(
       fixed = form_fix,
       data  = dat_aug,
-      random = .combine_two_same_group(form_random, stats::as.formula(paste("~ 1 + mis_any |", id))),
+      random = merge_random_list_by_group(form_random, stats::as.formula(paste("~ 1 + mis_any |", id))),
       control = nlme::lmeControl(opt = "nlminb")),silent = TRUE)
     }
 
