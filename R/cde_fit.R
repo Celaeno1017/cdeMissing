@@ -102,10 +102,9 @@ cde_fit <- function(
     form_fix <- stats::as.formula(paste(y_name, "~", rhs))
     form_random <- random
     random = merge_random_list_by_group(form_random, stats::as.formula(paste("~  mis_any-1 |id")))
-    print(random)
-    print(form_fix)
+    
     glmm_rhs <-lme_to_lmer(form_fix,random)$formula
-    print(glmm_rhs)
+    
     
     if (length(td_missing)!=0){
     
@@ -127,7 +126,7 @@ cde_fit <- function(
     form_glmm <-stats::as.formula(glmm_rhs)
     nAGQ <- control$nAGQ %||% 0
 
-    print(form_glmm)
+    
     fit <- lme4::glmer(
       form_glmm,
       data = dat_aug,
