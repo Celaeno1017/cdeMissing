@@ -28,10 +28,10 @@
 sim_cde_data <- function(
   model = c("lmm", "glmm"),
   beta = c(1, 0.5, 0.2, 0.2, 0.2),
-  m = 400,
+  m = 100,
   t = 5,
-  p = 0.1,
-  q = 0.1,
+  p = 0.2,
+  q = 0.15,
   sd_alpha = 0.3,
   sd_epsilon = 0.1,
   seed = NULL
