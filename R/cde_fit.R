@@ -98,7 +98,7 @@ cde_fit <- function(
   if (engine == "lme4") {
     # Default mirrors your GLMM CDE: (mis_id-1|id) + (mis_t_id-1|ct)
     # Here we generalize to mis_any and mis_td_any.
-    if (!is.nulll(correlation)){stop("lme4 does not support covariance structure.")}
+    if (!is.null(correlation)){stop("lme4 does not support covariance structure.")}
     form_fix <- stats::as.formula(paste(y_name, "~", rhs))
     form_random <- random
     random = merge_random_list_by_group(form_random, stats::as.formula(paste("~  mis_any-1 |id")))
