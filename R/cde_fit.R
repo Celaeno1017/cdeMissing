@@ -83,7 +83,7 @@ cde_fit <- function(
 
     out <- list(
       fit = fit,
-      engine = list("lme4",form_fix, merge_random_list_by_group(form_random, stats::as.formula(paste("~ mis_any-1 | id")))),
+      engine = "nlme",
       family = family,
       data_aug = if (isTRUE(return_augmented_data)) dat_aug else NULL,
       call = match.call()
@@ -127,7 +127,7 @@ cde_fit <- function(
 
     out <- list(
       fit = fit,
-      engine = list("lme4",form_fix, merge_random_list_by_group(form_random, stats::as.formula(paste("~ mis_any-1 | id")))),
+      engine ="lme4",
       family = family,
       data_aug = if (isTRUE(return_augmented_data)) dat_aug else NULL,
       call = match.call()
