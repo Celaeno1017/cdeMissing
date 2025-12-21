@@ -72,13 +72,13 @@ cde_fit <- function(
       data  = dat_aug,
       random = merge_random_list_by_group(form_random, stats::as.formula(paste("~ mis_any-1 | id"))),
       weights = nlme::varIdent(form = ~ 1 | mis_td_any),
-      control = nlme::lmeControl(opt = "nlminb")),silent = TRUE)
+      control = nlme::lmeControl(opt = "nlminb")),silent = FALSE)
     }
     else{ fit <-  try(nlme::lme(
       fixed = form_fix,
       data  = dat_aug,
       random = merge_random_list_by_group(form_random, stats::as.formula(paste("~  mis_any-1 |id"))),
-      control = nlme::lmeControl(opt = "nlminb")),silent = TRUE)
+      control = nlme::lmeControl(opt = "nlminb")),silent = FALSE)
     }
 
     out <- list(
