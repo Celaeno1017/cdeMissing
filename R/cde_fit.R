@@ -105,7 +105,7 @@ cde_fit <- function(
     print(random)
     print(form_fix)
     glmm_rhs <-lme_to_lmer(form_fix,random)$formula
-    prinnt(glmm_rhs)
+    print(glmm_rhs)
     
     if (length(td_missing)!=0){
     
