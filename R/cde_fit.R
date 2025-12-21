@@ -122,6 +122,8 @@ cde_fit <- function(
     #form_glmm <- stats::as.formula(paste(y_name, "~", glmm_rhs))
     form_glmm <-stats::as.formula(glmm_rhs)
     nAGQ <- control$nAGQ %||% 0
+
+    print(form_glmm)
     fit <- lme4::glmer(
       form_glmm,
       data = dat_aug,
