@@ -71,6 +71,7 @@ Key parameters include:
 - `correlation`: additional correlation structure passed to `nlme` package for lmm. Not available for glmm.
 - `family`: The error distribution and link function to be used in the model. For lmm, it should be gaussian.
 - `engine`: The package performs model fitting. for lmm, use `nlme`; for glmm, use `lme4`.
+
 The result will contain the following values:
 - `fit`:	the final fitted parameters of lmm/glmm model.
 
