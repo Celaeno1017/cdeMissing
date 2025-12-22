@@ -1,12 +1,12 @@
 Package: cdeMissing
 Type: Package
-Title:  with Missing Covariates in Longitudinal Mixed Models
+Title:  Random-Effects Approach with Missing Covariates in Longitudinal Mixed Models
 Version: 0.0.2
 Authors@R: c(
     person(given = "Jiangshan", family = "Zhang", role = c("aut", "cre"),
            email = jiszhang@ucdavis.edu")
   )
-Description: Implements a CDE-style approach for longitudinal mixed models with missing covariates.
+Description: Implements a Random-Effects approach for longitudinal mixed models with missing covariates.
     The package augments long-format data with missingness indicators and timepoint dummies, then fits
     LMMs (via 'nlme') or GLMMs (via 'lme4') using a consistent, configurable interface.
 License: MIT + file LICENSE
