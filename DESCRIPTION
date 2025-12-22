@@ -1,10 +1,10 @@
 Package: cdeMissing
 Type: Package
-Title: Conditional Distribution Estimation with Missing Covariates in Longitudinal Mixed Models
+Title:  with Missing Covariates in Longitudinal Mixed Models
 Version: 0.0.2
 Authors@R: c(
     person(given = "Jiangshan", family = "Zhang", role = c("aut", "cre"),
-           email = "you@example.com")
+           email = jiszhang@ucdavis.edu")
   )
 Description: Implements a CDE-style approach for longitudinal mixed models with missing covariates.
     The package augments long-format data with missingness indicators and timepoint dummies, then fits
