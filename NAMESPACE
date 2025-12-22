@@ -1,4 +1,3 @@
-# Generated manually for the skeleton; you may overwrite via roxygen2.
 export(cde_fit)
 export(cde_augment_data)
 export(cde_fixef)
