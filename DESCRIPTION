@@ -4,7 +4,7 @@ Title:  Random-Effects Approach with Missing Covariates in Longitudinal Mixed Mo
 Version: 0.0.2
 Authors@R: c(
     person(given = "Jiangshan", family = "Zhang", role = c("aut", "cre"),
-           email = jiszhang@ucdavis.edu")
+           email = "jiszhang@ucdavis.edu")
   )
 Description: Implements a Random-Effects approach for longitudinal mixed models with missing covariates.
     The package augments long-format data with missingness indicators and timepoint dummies, then fits
