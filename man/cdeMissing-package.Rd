@@ -1,10 +1,10 @@
 \name{cdeMissing-package}
 \alias{cdeMissing}
 \alias{cdeMissing-package}
-\title{cdeMissing: CDE-style mixed models with missing covariates}
+\title{cdeMissing: random effect approach to generalized linear mixed model Analysis of Incomplete Longitudinal Data}
 \description{
 The \pkg{cdeMissing} package provides utilities to (i) augment long-format longitudinal data
-with missingness indicators and timepoint dummy variables, and (ii) fit CDE-style LMM/GLMM
+with missingness indicators and timepoint dummy variables, and (ii) fit modified LMM/GLMM
 models using \code{nlme} (Gaussian LMM) or \code{lme4} (GLMM).
 }
 \details{
