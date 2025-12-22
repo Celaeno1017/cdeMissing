@@ -45,7 +45,7 @@ fit <- cde_fit(
     time = "Time",
     random = ~1|id,
     correlation=NULL,
-    missing = list(baseline = list("x1"), time_dependent = list("x2")),
+    missing = list(baseline = c("x1"), time_dependent = c("x2")),
     family = guassian(),
     engine = "nlme")
 
