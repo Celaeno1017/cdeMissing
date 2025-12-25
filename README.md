@@ -46,7 +46,7 @@ fit <- cde_fit(
     random = ~1|id,
     correlation=NULL,
     missing = list(baseline = c("x1"), time_dependent = c("x2")),
-    family = guassian(),
+    family = gaussian(),
     engine = "nlme")
 
 ####glmm with binomial response###########
